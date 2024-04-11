@@ -16,14 +16,16 @@ namespace api.Database
 
         public DbSet<Comment> Comments { get; set; }
 
-        public override int SaveChanges()
+        public override async Task<int> SaveChangesAsync(
+            CancellationToken cancellationToken = default
+        )
         {
             var addedEntities = ChangeTracker
                 .Entries()
                 .Where(e => e.State == EntityState.Added)
                 .ToList();
 
-            foreach (var entry in ChangeTracker.Entries())
+            foreach (var entry in addedEntities)
             {
                 if (entry.Entity is Stock stock)
                 {
@@ -36,7 +38,7 @@ namespace api.Database
                 }
             }
 
-            return base.SaveChanges();
+            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }
