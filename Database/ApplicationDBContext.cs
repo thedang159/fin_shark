@@ -15,5 +15,28 @@ namespace api.Database
         public DbSet<Stock> Stocks { get; set; }
 
         public DbSet<Comment> Comments { get; set; }
+
+        public override int SaveChanges()
+        {
+            var addedEntities = ChangeTracker
+                .Entries()
+                .Where(e => e.State == EntityState.Added)
+                .ToList();
+
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is Stock stock)
+                {
+                    stock.BeforeInsert();
+                }
+
+                if (entry.Entity is Comment comment)
+                {
+                    comment.BeforeInsert();
+                }
+            }
+
+            return base.SaveChanges();
+        }
     }
 }
