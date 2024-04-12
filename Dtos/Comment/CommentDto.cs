@@ -1,24 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace api.Models
+namespace api.Dtos.Comment
 {
-    [Table("Comments")]
-    public class Comment
+    public class CommentDto
     {
         public string Id { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
-        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
         public string? StockId { get; set; }
-        public Stock? Stock { get; set; }
-
-        public void BeforeInsert()
-        {
-            Id = "cmt_" + Ulid.NewUlid();
-        }
     }
 }

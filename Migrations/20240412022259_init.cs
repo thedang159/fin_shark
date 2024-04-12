@@ -36,23 +36,22 @@ namespace api.Migrations
                     Title = table.Column<string>(type: "text", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    StockId = table.Column<int>(type: "integer", nullable: true),
-                    StockId1 = table.Column<string>(type: "text", nullable: true)
+                    StockId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comments_Stocks_StockId1",
-                        column: x => x.StockId1,
+                        name: "FK_Comments_Stocks_StockId",
+                        column: x => x.StockId,
                         principalTable: "Stocks",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_StockId1",
+                name: "IX_Comments_StockId",
                 table: "Comments",
-                column: "StockId1");
+                column: "StockId");
         }
 
         /// <inheritdoc />

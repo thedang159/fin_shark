@@ -12,7 +12,7 @@ using api.Database;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240411070045_init")]
+    [Migration("20240412022259_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -37,10 +37,7 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("StockId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StockId1")
+                    b.Property<string>("StockId")
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
@@ -49,7 +46,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StockId1");
+                    b.HasIndex("StockId");
 
                     b.ToTable("Comments");
                 });
@@ -89,7 +86,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Models.Stock", "Stock")
                         .WithMany("Comments")
-                        .HasForeignKey("StockId1");
+                        .HasForeignKey("StockId");
 
                     b.Navigation("Stock");
                 });

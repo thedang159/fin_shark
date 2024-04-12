@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Database;
 using api.Dtos.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,14 +28,38 @@ namespace api.Repositories
             return stockModel;
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            return await _context.Stocks.ToListAsync();
+            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = query.IsDescending
+                        ? stocks.OrderByDescending(c => c.Symbol)
+                        : stocks.OrderBy(c => c.Symbol);
+                }
+            }
+
+            return await stocks.Include(c => c.Comments).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(string id)
         {
-            return await _context.Stocks.FindAsync(id);
+            return await _context
+                .Stocks.Include(c => c.Comments)
+                .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<Stock?> RemoveAsync(string id)
@@ -46,11 +71,16 @@ namespace api.Repositories
                 return null;
             }
 
-            _context.Remove(stockModel);
+            _context.Stocks.Remove(stockModel);
 
             await _context.SaveChangesAsync();
 
             return stockModel;
+        }
+
+        public async Task<bool> StockExists(string id)
+        {
+            return await _context.Stocks.AnyAsync(s => s.Id == id);
         }
 
         public async Task<Stock?> UpdateAsync(string id, UpdateStockRequestDto updateDto)
